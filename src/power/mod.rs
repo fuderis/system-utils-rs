@@ -88,15 +88,15 @@ impl PowerManager {
 
 impl PowerManager {
     /// Schedules the power action
-    pub async fn schedule(mode: PowerMode, timestamp: DateTime<Utc>) -> Result<()> {
+    pub async fn schedule(mode: PowerMode, timestamp: Option<DateTime<Utc>>) -> Result<()> {
         use PowerMode::*;
 
         match mode {
-            Shutdown => Self::shutdown(Some(timestamp)).await,
-            Suspend => Self::suspend(Some(timestamp)).await,
-            Reboot => Self::reboot(Some(timestamp)).await,
-            Lock => Self::lock(Some(timestamp)).await,
-            Logout => Self::logout(Some(timestamp)).await,
+            Shutdown => Self::shutdown(timestamp).await,
+            Suspend => Self::suspend(timestamp).await,
+            Reboot => Self::reboot(timestamp).await,
+            Lock => Self::lock(timestamp).await,
+            Logout => Self::logout(timestamp).await,
         }
     }
 
