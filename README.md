@@ -27,7 +27,7 @@ cargo add system-utils --features full
 
 ## Examples:
 
-### System Monitoring [feature `monitor`]:
+### System Monitoring [feature `monitor`]
 
 `SystemMonitor` caches system information, metrics, and device lists internally.
 Calling `refresh_*_with_interval()` updates the cached data only if the specified interval has elapsed,
@@ -54,7 +54,7 @@ fn main() {
 }
 ```
 
-### Basic System Info [feature `info`]:
+### Basic System Info [feature `info`]
 
 ```rust
 use system_utils::SystemInfo;
@@ -66,7 +66,7 @@ fn main() {
 }
 ```
 
-### System Metrics [feature `metrics`]:
+### System Metrics [feature `metrics`]
 
 `SystemMetrics::new()` collects a complete snapshot of the current system state, including CPU, GPU, memory, disks, network interfaces,
 proxy configuration, battery information (when available), and system uptime.
@@ -82,7 +82,7 @@ fn main() {
 }
 ```
 
-### Devices List [feature `devices`]:
+### Devices List [feature `devices`]
 
 `DevicesList::new()` creates a snapshot of the currently connected hardware devices, including monitors, audio devices, cameras, and USB devices.
 The snapshot is immutable and reflects the hardware state at the time it was created.
@@ -97,7 +97,7 @@ fn main() {
 }
 ```
 
-### Audio Control [feature `audio`]:
+### Audio Control [feature `audio`]
 
 `SystemAudio` provides a cross-platform API for controlling the system master volume.
 It supports getting and setting the volume, increasing or decreasing it by a delta, and muting or unmuting the default audio output device.
@@ -135,7 +135,7 @@ async fn main() -> Result<()> {
 }
 ```
 
-### Power Management [feature `power`]:
+### Power Management [feature `power`]
 
 `SystemPower` provides cross-platform power management, including shutdown, reboot, suspend, lock, and logout operations.
 Every action can be executed immediately or scheduled for a future `DateTime<Utc>`.
