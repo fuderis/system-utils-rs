@@ -66,9 +66,9 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Cancels the power action
-    pub async fn cancel() -> bool {
-        let had_task = POWER_STATUS.get().await.is_some();
+    /// Cancels the power action (returns the canceled `PowerMode`)
+    pub async fn cancel() -> Option<PowerMode> {
+        let status = POWER_STATUS.get().await.clone();
 
         if let Some(task) = POWER_TASK.get().await.as_ref() {
             task.abort();
@@ -77,7 +77,7 @@ impl PowerManager {
         POWER_TASK.set(None).await;
         POWER_STATUS.set(None).await;
 
-        had_task
+        status.map(|s| s.mode)
     }
 
     /// Returns status about the active power action
