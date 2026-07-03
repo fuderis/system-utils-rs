@@ -92,13 +92,11 @@ impl PowerManager {
         use PowerMode::*;
 
         match mode {
-            Shutdown => Self::shutdown(timestamp),
-            Suspend => Self::suspend(timestamp),
-            Reboot => Self::reboot(timestamp),
-            Lock => Self::lock(timestamp),
-            Logout => Self::logout(timestamp),
-            Cancel => Self::cancel(timestamp),
-            Status => Self::status(timestamp),
+            Shutdown => Self::shutdown(Some(timestamp)).await,
+            Suspend => Self::suspend(Some(timestamp)).await,
+            Reboot => Self::reboot(Some(timestamp)).await,
+            Lock => Self::lock(Some(timestamp)).await,
+            Logout => Self::logout(Some(timestamp)).await,
         }
     }
 

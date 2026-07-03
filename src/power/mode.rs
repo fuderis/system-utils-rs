@@ -10,6 +10,4 @@ pub enum PowerMode {
     Reboot,
     Lock,
     Logout,
-    Cancel,
-    Status,
 }
