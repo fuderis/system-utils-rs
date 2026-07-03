@@ -31,3 +31,8 @@ pub use audio::AudioControl;
 pub mod power;
 #[cfg(feature = "power")]
 pub use power::PowerManager;
+
+#[cfg(feature = "theme")]
+pub mod theme;
+#[cfg(feature = "theme")]
+pub use theme::{SystemTheme, ThemeStyle};

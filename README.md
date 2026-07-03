@@ -177,6 +177,23 @@ async fn main() -> Result<()> {
 }
 ```
 
+### System Theme Switcher [feature `theme`]
+
+A cross-platform utility for switching the system theme between Light and Dark modes
+on Linux, macOS and Windows through native operating system APIs.
+
+```rust
+use system_utils::{ThemeStyle, SystemTheme};
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    SystemTheme::switch(ThemeStyle::Dark).await?;
+    println!("Dark theme enabled.");
+
+    Ok(())
+}
+```
+
 ## License & Feedback:
 
 > Distributed under the [MIT](https://github.com/fuderis/system-utils-rs/blob/main/LICENSE.md) license.

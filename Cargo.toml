@@ -3,7 +3,7 @@ name = "system-utils"
 description = "Cross-platform utilities for interacting with operating system features such as audio control, power management, system information, hardware monitoring, and device enumeration."
 keywords = ["system", "utilities", "audio", "power", "metrics"]
 categories = ["development-tools"]
-version = "0.1.0"
+version = "0.1.1"
 license = "MIT"
 authors = ["Bulat Sh. <synapdrake@ya.ru>"]
 repository = "https://github.com/fuderis/system-utils-rs"
@@ -30,7 +30,7 @@ rusb = { version = "0.9.4", optional = true }
 nokhwa = { version = "0.10.11", features = ["input-v4l"], optional = true }
 
 [features]
-full = ["info", "metrics", "devices", "monitor", "audio", "power"]
+full = ["info", "metrics", "devices", "monitor", "audio", "power", "theme"]
 full-metrics = ["monitor", "info", "metrics", "devices"]
 monitor = ["info"]
 info = ["dep:sysinfo"]
@@ -38,4 +38,4 @@ metrics = ["dep:sysinfo", "dep:network-interface", "dep:wgpu", "dep:pollster", "
 devices = ["dep:display-info", "dep:cpal", "dep:rusb", "dep:nokhwa"]
 audio = ["dep:regex"]
 power = ["dep:chrono"]
-
+theme = []
