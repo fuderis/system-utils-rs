@@ -1,24 +1,8 @@
+pub mod style;
+pub use style::ThemeStyle;
+
 use crate::prelude::*;
 use ThemeStyle::*;
-
-/// The system theme mode
-#[derive(Debug, Display, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
-#[serde(rename_all = "lowercase")]
-#[display(rename = "lowercase")]
-pub enum ThemeStyle {
-    Light,
-    Dark,
-}
-
-impl ThemeStyle {
-    pub fn is_light(&self) -> bool {
-        matches!(self, Self::Light)
-    }
-
-    pub fn is_dark(&self) -> bool {
-        matches!(self, Self::Dark)
-    }
-}
 
 /// The system theme switcher
 #[derive(Debug)]

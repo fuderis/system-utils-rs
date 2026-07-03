@@ -19,8 +19,8 @@ pub struct ScheduledPowerTask {
 pub struct PowerManager;
 
 impl PowerManager {
-    /// Schedules the power action
-    async fn schedule<F>(
+    /// Helper method to schedule the power action
+    async fn schedule_with<F>(
         mode: PowerMode,
         execute_at: Option<DateTime<Utc>>,
         callback: F,
@@ -87,9 +87,24 @@ impl PowerManager {
 }
 
 impl PowerManager {
+    /// Schedules the power action
+    pub async fn schedule(mode: PowerMode, timestamp: DateTime<Utc>) -> Result<()> {
+        use PowerMode::*;
+
+        match mode {
+            Shutdown => Self::shutdown(timestamp),
+            Suspend => Self::suspend(timestamp),
+            Reboot => Self::reboot(timestamp),
+            Lock => Self::lock(timestamp),
+            Logout => Self::logout(timestamp),
+            Cancel => Self::cancel(timestamp),
+            Status => Self::status(timestamp),
+        }
+    }
+
     /// Does shutdown the system in future
     pub async fn shutdown(timestamp: Option<DateTime<Utc>>) -> Result<()> {
-        Self::schedule(PowerMode::Shutdown, timestamp, async {
+        Self::schedule_with(PowerMode::Shutdown, timestamp, async {
             Self::shutdown_now().await
         })
         .await
@@ -114,7 +129,7 @@ impl PowerManager {
 
     /// Does reboot the system in future
     pub async fn reboot(timestamp: Option<DateTime<Utc>>) -> Result<()> {
-        Self::schedule(PowerMode::Reboot, timestamp, async {
+        Self::schedule_with(PowerMode::Reboot, timestamp, async {
             Self::reboot_now().await
         })
         .await
@@ -143,7 +158,7 @@ impl PowerManager {
 
     /// Does suspend the system in future
     pub async fn suspend(timestamp: Option<DateTime<Utc>>) -> Result<()> {
-        Self::schedule(PowerMode::Suspend, timestamp, async {
+        Self::schedule_with(PowerMode::Suspend, timestamp, async {
             Self::suspend_now().await
         })
         .await
@@ -172,7 +187,7 @@ impl PowerManager {
 
     /// Does lock the system in future
     pub async fn lock(timestamp: Option<DateTime<Utc>>) -> Result<()> {
-        Self::schedule(PowerMode::Lock, timestamp, async { Self::lock_now().await }).await
+        Self::schedule_with(PowerMode::Lock, timestamp, async { Self::lock_now().await }).await
     }
 
     /// Does lock the system
@@ -198,7 +213,7 @@ impl PowerManager {
 
     /// Does logout the system in future
     pub async fn logout(timestamp: Option<DateTime<Utc>>) -> Result<()> {
-        Self::schedule(PowerMode::Logout, timestamp, async {
+        Self::schedule_with(PowerMode::Logout, timestamp, async {
             Self::logout_now().await
         })
         .await
