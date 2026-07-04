@@ -1,7 +1,7 @@
 [package]
 name = "system-utils"
 description = "Cross-platform utilities for interacting with operating system features such as audio control, power management, system information, hardware monitoring, and device enumeration."
-keywords = ["system", "utilities", "audio", "power", "metrics", "media", "info"]
+keywords = ["system", "utilities", "metrics", "audio", "power"]
 categories = ["development-tools"]
 version = "0.1.5"
 license = "MIT"
