@@ -1,9 +1,9 @@
 [package]
 name = "system-utils"
 description = "Cross-platform utilities for interacting with operating system features such as audio control, power management, system information, hardware monitoring, and device enumeration."
-keywords = ["system", "utilities", "audio", "power", "metrics"]
+keywords = ["system", "utilities", "audio", "power", "metrics", "media", "info"]
 categories = ["development-tools"]
-version = "0.1.4"
+version = "0.1.5"
 license = "MIT"
 authors = ["Bulat Sh. <synapdrake@ya.ru>"]
 repository = "https://github.com/fuderis/system-utils-rs"
@@ -37,5 +37,6 @@ info = ["dep:sysinfo"]
 metrics = ["dep:sysinfo", "dep:network-interface", "dep:wgpu", "dep:pollster", "dep:battery"]
 devices = ["dep:display-info", "dep:cpal", "dep:rusb", "dep:nokhwa"]
 audio = ["dep:regex"]
+media = []
 power = ["dep:chrono"]
 theme = []

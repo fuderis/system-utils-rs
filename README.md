@@ -8,15 +8,18 @@
 
 # System Utilities
 
-Cross-platform utilities for interacting with operating system features such as audio control, power management, system information, hardware monitoring, and device enumeration.
+Cross-platform utilities for interacting with operating system features such as audio and media control,
+power management, system information, hardware monitoring, device enumeration, and desktop integration.
 
 ## Features:
 
 * Audio management
+* Media playback control (play, pause, next, previous, metadata)
 * Power actions with optional timers
 * System information
 * Real-time system metrics monitoring
 * Hardware device enumeration
+* System theme switching
 * Cross-platform API (Windows, Linux, macOS where supported)
 
 # Installation
@@ -130,6 +133,44 @@ async fn main() -> Result<()> {
 
     AudioControl::set_mute(false).await?;
     println!("Audio restored.");
+
+    Ok(())
+}
+```
+
+### Media Control [feature `media`]
+
+`MediaControl` provides a cross-platform API for controlling media playback.
+Depending on the operating system, it supports playback control, track navigation,
+playback position, duration, and media metadata.
+
+> **Linux:** Requires `playerctl` to be installed.
+> **Windows & macOS:** Only a subset of media control features is currently supported.
+
+```rust
+use system_utils::MediaControl;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // read current media metadata
+    let media = MediaControl::metadata().await?;
+
+    println!("Title   : {}", media.title);
+    println!("Artist  : {}", media.artist);
+    println!("Album   : {}", media.album);
+    println!("Playing : {}", media.playing);
+
+    // playback control
+    MediaControl::pause().await?;
+    MediaControl::play().await?;
+
+    // seek
+    MediaControl::seek_forward(10).await?;
+    MediaControl::seek_backward(5).await?;
+
+    // track navigation
+    MediaControl::next_track().await?;
+    MediaControl::previous_track().await?;
 
     Ok(())
 }

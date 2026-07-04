@@ -22,17 +22,22 @@ pub mod devices;
 #[cfg(feature = "devices")]
 pub use devices::DevicesList;
 
+#[cfg(feature = "theme")]
+pub mod theme;
+#[cfg(feature = "theme")]
+pub use theme::{SystemTheme, ThemeStyle};
+
 #[cfg(feature = "audio")]
 pub mod audio;
 #[cfg(feature = "audio")]
 pub use audio::AudioControl;
 
+#[cfg(feature = "media")]
+pub mod media;
+#[cfg(feature = "media")]
+pub use media::MediaControl;
+
 #[cfg(feature = "power")]
 pub mod power;
 #[cfg(feature = "power")]
 pub use power::{PowerManager, PowerMode};
-
-#[cfg(feature = "theme")]
-pub mod theme;
-#[cfg(feature = "theme")]
-pub use theme::{SystemTheme, ThemeStyle};
