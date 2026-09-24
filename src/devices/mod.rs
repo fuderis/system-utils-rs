@@ -3,7 +3,7 @@ pub use structs::*;
 
 use crate::prelude::*;
 
-/// The devices snapshot
+/// Devices snapshot.
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct DevicesList {
     pub monitors: Vec<MonitorInfo>,
@@ -13,6 +13,7 @@ pub struct DevicesList {
 }
 
 impl DevicesList {
+    /// Creates new snapshot.
     pub fn new() -> Self {
         Self {
             monitors: Self::monitors(),
@@ -24,6 +25,7 @@ impl DevicesList {
 }
 
 impl DevicesList {
+    /// Returns physical monitors list.
     pub fn monitors() -> Vec<MonitorInfo> {
         use display_info::DisplayInfo;
 
@@ -50,6 +52,7 @@ impl DevicesList {
         result
     }
 
+    /// Returns physical audio devices list.
     pub fn audio() -> Vec<AudioDeviceInfo> {
         use cpal::traits::{DeviceTrait, HostTrait};
         use std::collections::HashMap;
@@ -305,6 +308,7 @@ impl DevicesList {
         devices
     }
 
+    /// Returns physical cameras list.
     pub fn cameras() -> Vec<CameraInfo> {
         use nokhwa::query;
 
@@ -321,6 +325,7 @@ impl DevicesList {
         result
     }
 
+    /// Returns physical USB devices list.
     pub fn usb() -> Vec<UsbDeviceInfo> {
         use rusb::{Context, UsbContext};
         use std::time::Duration;

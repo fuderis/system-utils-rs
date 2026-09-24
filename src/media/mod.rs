@@ -2,7 +2,7 @@ pub mod meta;
 pub use meta::MediaMetadata;
 
 use crate::prelude::*;
-use tokio::process::Command;
+use atoman::Command;
 
 /// The media control manager
 /// (for Linux requires `playerctl` to be installed)

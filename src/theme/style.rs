@@ -3,7 +3,7 @@ use crate::prelude::*;
 /// The system theme mode
 #[derive(Debug, Display, Clone, Copy, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "lowercase")]
-#[display(rename = "lowercase")]
+#[display(rename_all = "lowercase")]
 pub enum ThemeStyle {
     Light,
     Dark,

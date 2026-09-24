@@ -8,9 +8,9 @@ use std::sync::Mutex as StdMutex;
 use sysinfo::{CpuRefreshKind, Disks, Networks, RefreshKind, System};
 
 static SYSTEM: State<Arc<StdMutex<System>>> = State::new(|| {
-    std_arc_mutex!(System::new_with_specifics(
+    arc!(StdMutex::new(System::new_with_specifics(
         RefreshKind::everything().with_cpu(CpuRefreshKind::everything())
-    ))
+    )))
 });
 
 /// The system metrics
@@ -29,7 +29,7 @@ pub struct SystemMetrics {
 impl SystemMetrics {
     /// Creates the system metrics snapshot
     pub fn new() -> Self {
-        (**SYSTEM.dirty_get()).lock().unwrap().refresh_all();
+        (**SYSTEM.get()).lock().unwrap().refresh_all();
 
         Self {
             cpu: Self::cpu(),
@@ -44,7 +44,7 @@ impl SystemMetrics {
     }
 
     fn system() -> Arc<StdMutex<System>> {
-        (*SYSTEM.dirty_get()).clone()
+        (*SYSTEM.get()).clone()
     }
 }
 

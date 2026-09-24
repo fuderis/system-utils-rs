@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-use tokio::time::{Duration, Instant};
+use atoman::{Duration, Instant};
 
 /// The system monitor
 #[derive(Default, Clone)]

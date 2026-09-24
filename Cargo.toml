@@ -3,7 +3,7 @@ name = "system-utils"
 description = "Cross-platform utilities for interacting with operating system features such as audio control, power management, system information, hardware monitoring, and device enumeration."
 keywords = ["system", "utilities", "metrics", "audio", "power"]
 categories = ["development-tools"]
-version = "0.1.6"
+version = "0.2.0"
 license = "MIT"
 authors = ["Bulat Sh. <synapdrake@ya.ru>"]
 repository = "https://github.com/fuderis/system-utils-rs"
@@ -11,9 +11,9 @@ readme = "README.md"
 edition = "2024"
 
 [dependencies]
-tokio = { version = "1.52.3", features = ["full"] }
-atoman = "0.4.0"
-macron = { version = "0.2.1", features = ["derive", "path", "string"] }
+atoman = { version = "0.11.5" }
+macron = { version = "0.5.1", features = ["derive", "path", "string"] }
+
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.150", optional = true }
 regex = { version = "1.12.4", optional = true }

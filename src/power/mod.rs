@@ -2,11 +2,17 @@ pub mod mode;
 pub use mode::PowerMode;
 
 use crate::prelude::*;
-use chrono::{DateTime, Utc};
-use tokio::{process::Command, task::JoinHandle};
 
-static POWER_TASK: State<Option<Arc<JoinHandle<()>>>> = State::default();
-static POWER_STATUS: State<Option<ScheduledPowerTask>> = State::default();
+use atoman::{Command, JoinHandle, time};
+use chrono::{DateTime, Utc};
+
+static POWER_STATE: State<Option<PowerState>> = State::default();
+
+#[derive(Debug, Clone)]
+pub struct PowerState {
+    task: Arc<JoinHandle<()>>,
+    status: ScheduledPowerTask,
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct ScheduledPowerTask {
@@ -14,12 +20,12 @@ pub struct ScheduledPowerTask {
     pub execute_at: DateTime<Utc>,
 }
 
-/// The system power manager
+/// System power manager.
 #[derive(Debug)]
 pub struct PowerManager;
 
 impl PowerManager {
-    /// Helper method to schedule the power action
+    /// Helper method to schedule the power action.
     async fn schedule_with<F>(
         mode: PowerMode,
         execute_at: Option<DateTime<Utc>>,
@@ -34,31 +40,27 @@ impl PowerManager {
             }
 
             // cancel previous task
-            if let Some(old) = POWER_TASK.get().await.as_ref() {
-                old.abort();
-            }
+            Self::cancel().await;
 
-            POWER_TASK.set(None).await;
+            let mut guard = POWER_STATE.lock().await;
 
-            POWER_STATUS
-                .set(Some(ScheduledPowerTask {
-                    mode,
-                    execute_at: timestamp,
-                }))
-                .await;
-
+            // spawn new task
             let duration = (timestamp - Utc::now()).to_std()?;
+            let handle = atoman::spawn(async move {
+                time::sleep(duration).await;
 
-            let handle = tokio::spawn(async move {
-                tokio::time::sleep(duration).await;
-
-                POWER_STATUS.set(None).await;
-                POWER_TASK.set(None).await;
-
+                POWER_STATE.lock().await.take();
                 let _ = callback.await;
             });
 
-            POWER_TASK.set(Some(arc!(handle))).await;
+            // update state
+            guard.replace(PowerState {
+                task: arc!(handle),
+                status: ScheduledPowerTask {
+                    mode,
+                    execute_at: timestamp,
+                },
+            });
         } else {
             callback.await?;
         }
@@ -66,28 +68,34 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Cancels the power action (returns the canceled `PowerMode`)
+    /// Cancels power action (returns the canceled `PowerMode`).
     pub async fn cancel() -> Option<PowerMode> {
-        let status = POWER_STATUS.get().await.clone();
-
-        if let Some(task) = POWER_TASK.get().await.as_ref() {
-            task.abort();
+        // cancel active task without lock's
+        if let Some(state) = POWER_STATE.get().as_ref() {
+            state.task.abort();
         }
 
-        POWER_TASK.set(None).await;
-        POWER_STATUS.set(None).await;
-
-        status.map(|s| s.mode)
+        // remove task from state
+        let mut guard = POWER_STATE.lock().await;
+        guard.take().map(|s| s.status.mode)
     }
 
-    /// Returns status about the active power action
+    /// Returns active power action (fast check).
+    #[inline]
+    pub fn check() -> Option<ScheduledPowerTask> {
+        (*POWER_STATE.get()).as_ref().map(|s| s.status.clone())
+    }
+
+    /// Returns active power action.
     pub async fn status() -> Option<ScheduledPowerTask> {
-        POWER_STATUS.get().await.as_ref().clone()
+        (*POWER_STATE.get_locked().await)
+            .as_ref()
+            .map(|s| s.status.clone())
     }
 }
 
 impl PowerManager {
-    /// Schedules the power action
+    /// Schedules power action.
     pub async fn schedule(mode: PowerMode, timestamp: Option<DateTime<Utc>>) -> Result<()> {
         use PowerMode::*;
 
@@ -100,7 +108,7 @@ impl PowerManager {
         }
     }
 
-    /// Does shutdown the system in future
+    /// Does shutdown the system in future.
     pub async fn shutdown(timestamp: Option<DateTime<Utc>>) -> Result<()> {
         Self::schedule_with(PowerMode::Shutdown, timestamp, async {
             Self::shutdown_now().await
@@ -108,7 +116,7 @@ impl PowerManager {
         .await
     }
 
-    /// Does shutdown the system
+    /// Does shutdown the system.
     pub async fn shutdown_now() -> Result<()> {
         let (cmd, args): (&str, &[&str]) = {
             #[cfg(windows)]
@@ -125,7 +133,7 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Does reboot the system in future
+    /// Does reboot the system in future.
     pub async fn reboot(timestamp: Option<DateTime<Utc>>) -> Result<()> {
         Self::schedule_with(PowerMode::Reboot, timestamp, async {
             Self::reboot_now().await
@@ -133,7 +141,7 @@ impl PowerManager {
         .await
     }
 
-    /// Does reboot the system
+    /// Does reboot the system.
     pub async fn reboot_now() -> Result<()> {
         let (cmd, args): (&str, &[&str]) = {
             #[cfg(target_os = "linux")]
@@ -154,7 +162,7 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Does suspend the system in future
+    /// Does suspend the system in future.
     pub async fn suspend(timestamp: Option<DateTime<Utc>>) -> Result<()> {
         Self::schedule_with(PowerMode::Suspend, timestamp, async {
             Self::suspend_now().await
@@ -162,7 +170,7 @@ impl PowerManager {
         .await
     }
 
-    /// Does suspend the system
+    /// Does suspend the system.
     pub async fn suspend_now() -> Result<()> {
         let (cmd, args): (&str, &[&str]) = {
             #[cfg(target_os = "linux")]
@@ -183,12 +191,12 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Does lock the system in future
+    /// Does lock the system in future.
     pub async fn lock(timestamp: Option<DateTime<Utc>>) -> Result<()> {
         Self::schedule_with(PowerMode::Lock, timestamp, async { Self::lock_now().await }).await
     }
 
-    /// Does lock the system
+    /// Does lock the system.
     pub async fn lock_now() -> Result<()> {
         let (cmd, args): (&str, &[&str]) = {
             #[cfg(target_os = "linux")]
@@ -209,7 +217,7 @@ impl PowerManager {
         Ok(())
     }
 
-    /// Does logout the system in future
+    /// Does logout the system in future.
     pub async fn logout(timestamp: Option<DateTime<Utc>>) -> Result<()> {
         Self::schedule_with(PowerMode::Logout, timestamp, async {
             Self::logout_now().await
@@ -217,7 +225,7 @@ impl PowerManager {
         .await
     }
 
-    /// Does logout the system
+    /// Does logout the system.
     pub async fn logout_now() -> Result<()> {
         let (cmd, args): (&str, &[&str]) = {
             #[cfg(target_os = "linux")]
